@@ -1,0 +1,13 @@
+#http://stackoverflow.com/questions/3719243/recommended-gitignore-file-for-python-projects
+#https://github.com/github/gitignore/blob/master/Python.gitignore
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+
+# C extensions
+*.so
+
+
+*.dev.js
