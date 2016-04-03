@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+<link href="/static/css/styles.css?${buildNum}" rel="stylesheet" type="text/css" />
+
+${self.head_content()}
+
+</head>
+<body>
+<div>
+	<div class="header">
+		<div style="width: 60%; margin: 0 auto; text-align: left;">
+			<a class="logo" href="/">myforum</a>
+			<div class="nav-bar" style="float: right">
+				<a href="#">Signin</a>
+				<a href="${url_for('signup')}">Signup</a>
+			</div>
+		</div>
+	</div>
+	<div class="page-content">
+		${self.page_content()}
+	</div>
+</body>
+</html>
+
+
+<%def name="head_content()">
+</%def>
+
+
+<%def name="page_content()">
+</%def>

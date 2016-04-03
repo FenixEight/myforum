@@ -1,6 +1,7 @@
+CREATE SEQUENCE seq_comment MINVALUE 1;
+
 CREATE TABLE "comment"(
-	comment_id int not null,
+	comment_id int not null default nextval('"seq_comment"'::text) primary key,
 	user_name varchar(128),
 	comment_text text,
-	creation_date timestamp not null,
-	is_deleted bool not null default false);
+	creation_date timestamp not null);
