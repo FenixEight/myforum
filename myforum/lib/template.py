@@ -1,5 +1,5 @@
 from mako import exceptions
-from flask.ext.mako import render_template
+from flask_mako import render_template
 
 
 #http://stackoverflow.com/questions/390409/how-do-you-debug-mako-templates

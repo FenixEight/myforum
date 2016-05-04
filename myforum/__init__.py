@@ -1,5 +1,5 @@
 from flask import Flask
-from flask.ext.mako import MakoTemplates
+from flask_mako import MakoTemplates
 
 app = Flask(__name__)
 
@@ -13,6 +13,6 @@ from myforum.controllers import main
 from myforum.controllers import comment
 
 
-connection_string = "host='localhost' port=5432 dbname='myforum' user='postgres' password=''"
+connection_string = "host='localhost' port=5432 dbname='postgres' user='postgres' password='0932512759'"
 app.db = DataService(connection_string)
 

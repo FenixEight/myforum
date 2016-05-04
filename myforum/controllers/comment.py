@@ -32,5 +32,7 @@ def edit_comment(comment_id):
 
 @app.route('/comments/delete')
 def delete_comment():
-	pass
+	print("del")
+	return redirect(url_for('home'))
+
 

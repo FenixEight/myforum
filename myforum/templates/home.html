@@ -31,7 +31,7 @@
 		<div class="creation-date">
 			${c.creation_date}
 			- <a href="${url_for('edit_comment', comment_id=c.id)}">edit</a>
-			- <a href="#">delete</a>
+			- <a href="${url_for('delete_comment')}">delete</a>
 		</div>
 		<div class="comment-text">${c.comment_text}</div>
 	</div>
