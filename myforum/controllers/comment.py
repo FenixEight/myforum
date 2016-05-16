@@ -14,6 +14,7 @@ def get_comment(p):
 @app.route('/comments/add', methods=['POST'])
 def add_comment():
 	if request.method == 'POST':
+
 		c = get_comment(request.form)
 		app.db.comment.add(c)
 		return redirect(url_for('home'))
@@ -30,9 +31,12 @@ def edit_comment(comment_id):
 		return render('edit_comment', comment=comment)
 
 
-@app.route('/comments/delete')
-def delete_comment():
-	print("del")
-	return redirect(url_for('home'))
+@app.route('/comments/delete/<int:comment_id>', methods=['GET', 'POST'])
+def delete_comment(comment_id):
+	if request.method == 'POST':
+		app.db.comment.delete(comment_id)
+		return redirect(url_for('home'))
+	else:
+	    return render('delete_comment',comment_id=comment_id)
 
 

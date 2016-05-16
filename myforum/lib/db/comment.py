@@ -32,7 +32,7 @@ class CommentManager(BaseManager):
         query = '''
             DELETE FROM "comment"
             WHERE comment_id = %s'''
-        params = (id)
+        params = (id,)
         self.execute(query, params)
 
     def get_all(self):
