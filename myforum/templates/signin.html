@@ -1,10 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+<%inherit file="base.html"/>
 
-</body>
-</html>
+
+<%def name="page_content()">
+
+<h1>Signup</h1>
+
+<form method="post" action="${url_for('signin')}">
+	<div class="input-section">
+		<label>Username</label>
+		<input type="text" name="user_name" />
+	</div>
+    <div class="input-section">
+		<label>Password</label>
+		<input type="password" name="password" />
+	</div>
+    <label><input id="rememberme" name="rememberme" value="remember" type="checkbox" /> Remember me</label>
+
+	<input type="submit" value="Signup">
+</form>
+
+</%def>

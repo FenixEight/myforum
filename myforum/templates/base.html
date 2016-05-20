@@ -12,7 +12,7 @@ ${self.head_content()}
 		<div style="width: 60%; margin: 0 auto; text-align: left;">
 			<a class="logo" href="/">myforum</a>
 			<div class="nav-bar" style="float: right">
-				<a href="#">Signin</a>
+				<a href="${url_for('signin')}">Signin</a>
 				<a href="${url_for('signup')}">Signup</a>
 			</div>
 		</div>
@@ -20,6 +20,7 @@ ${self.head_content()}
 	<div class="page-content">
 		${self.page_content()}
 	</div>
+</div>
 </body>
 
 </html>

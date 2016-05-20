@@ -5,6 +5,8 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
 from psycopg2.pool import ThreadedConnectionPool
 
 from myforum.lib.db.comment import CommentManager
+from myforum.lib.db.user import UserManager
+from myforum.lib.db.user import PostManager
 
 
 class DataService:
