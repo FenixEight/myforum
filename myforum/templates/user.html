@@ -1,0 +1,38 @@
+<%inherit file="base.html"/>
+
+
+<%def name="page_content()">
+
+<h1>Comments</h1>
+%if posts:
+	${self.posts_content()}
+%else:
+	No posts yet.
+%endif
+
+</%def>
+
+<%def name="posts_content()">
+%for p in posts:
+	<div class="post">
+		<div class="user-name">${username}</div>
+		<div class="creation-date">
+			${p.date_time}
+			%if is_auth:
+			% if p.user_id == current_user.id or current_user.admin_mod == 1:
+			    - <a href="${url_for('edit_comment', post_id=p.post_id)}">edit</a>
+			    - <a href="${url_for('delete_comment', post_id=p.post_id)} ">Delete</a>
+			%endif
+			%endif
+		</div>
+		<div class="comment-text">${p.post}</div>
+		<div class="ip">${p.ip}</div>
+	</div>
+%endfor
+%if page != pages:
+		<a href="${url_for('user', username = username, page = page +1)}">Next</a>
+		%endif
+		%if page !=1:
+		<a href="${url_for('user', username = username, page = page -1)}">Previos</a>
+		%endif
+</%def>

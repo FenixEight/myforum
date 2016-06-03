@@ -2,27 +2,37 @@
 
 
 <%def name="page_content()">
+
 <h1>Comments</h1>
-%if comments:
-	${self.comments_content()}
+%if posts:
+	You have posts, but you did not do anything! :)
 %else:
-	No comments yet.
+	No posts yet.
 %endif
 
+%if not is_auth:
+    You need a registration
+%else:
+     ${self.post_form()}
 
-<form method="post" action="${url_for('add_comment')}">
-	<h2>Post your comment</h2>
-	<div class="input-section">
-		<label>Your name</label>
-		<input type="text" name="user_name" />
-	</div>
-	<div class="input-section">
-		<label>Your comment</label>
-		<textarea name="comment_text"></textarea>
-	</div>
-	<input type="submit" value="Post comment" />
-</form>
+%endif
+
 </%def>
+
+
+<%def name="post_form()">
+	<form method="post" action="${url_for('add_comment')}">
+		<h2>Post your comment</h2>
+		<div class="input-section">
+		</div>
+		<div class="input-section">
+			<label>Your comment</label>
+			<textarea name="comment_text"></textarea>
+		</div>
+		<input type="submit" value="Post comment" />
+	</form>
+</%def>
+
 
 
 <%def name="comments_content()">

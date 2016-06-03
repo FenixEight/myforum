@@ -1,42 +1,55 @@
 import random
+import datetime
 from flask import Flask, request, session, redirect, url_for
 
 from myforum import app
 from myforum.lib.template import render
-from myforum.model import Comment
+from myforum.model import Post
 
-def get_comment(p):
-	c = Comment()
-	c.user_name = p['user_name']
-	c.comment_text = p['comment_text']
+
+def get_post(req):
+	c = Post()
+	c.post = req.form['comment_text']
+	c.date_time = datetime.datetime.now()
+	c.user_agent = req.headers.get('User-Agent')
+	c.ip = req.remote_addr
+
+	u = app.db.user.get_username_by_name(session['username'])
+	c.user_id = u.id
+
 	return c
+
 
 @app.route('/comments/add', methods=['POST'])
 def add_comment():
 	if request.method == 'POST':
+		c = get_post(request)
+		if len(c.post)<6:
+			print('Too short message')
+			return render('home')
 
-		c = get_comment(request.form)
-		app.db.comment.add(c)
+		app.db.post.add_post(c)
 		return redirect(url_for('home'))
 
-@app.route('/comments/edit/<int:comment_id>', methods=['GET', 'POST'])
-def edit_comment(comment_id):
+
+@app.route('/comments/edit/<int:post_id>', methods=['GET', 'POST'])
+def edit_comment(post_id):
 	if request.method == 'POST':
-		c = get_comment(request.form)
-		c.id = comment_id
-		app.db.comment.update(c)
+		c = get_post(request)
+		c.post_id = post_id
+		app.db.post.update_post(c)
 		return redirect(url_for('home'))
 	else:
-		comment = app.db.comment.get_by_id(comment_id)
-		return render('edit_comment', comment=comment)
+		post = app.db.post.get_by_id(post_id)
+		return render('edit_comment', c=post)
 
 
-@app.route('/comments/delete/<int:comment_id>', methods=['GET', 'POST'])
-def delete_comment(comment_id):
+@app.route('/comments/delete/<int:post_id>', methods=['GET', 'POST'])
+def delete_comment(post_id):
 	if request.method == 'POST':
-		app.db.comment.delete(comment_id)
+		app.db.post.delete_post(post_id)
 		return redirect(url_for('home'))
 	else:
-	    return render('delete_comment',comment_id=comment_id)
+		return render('delete_comment', post_id=post_id)
 
 

@@ -3,7 +3,7 @@
 
 <%def name="page_content()">
 
-<h1>Signup</h1>
+<h1>Signin</h1>
 
 <form method="post" action="${url_for('signin')}">
 	<div class="input-section">
@@ -14,9 +14,9 @@
 		<label>Password</label>
 		<input type="password" name="password" />
 	</div>
-    <label><input id="rememberme" name="rememberme" value="remember" type="checkbox" /> Remember me</label>
+    <label><input name="rememberme" value="true" type="checkbox" /> Remember me</label>
 
-	<input type="submit" value="Signup">
+	<input type="submit" value="Signin">
 </form>
 
 </%def>
