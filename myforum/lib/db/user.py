@@ -24,3 +24,10 @@ class UserManager(BaseManager):
         VALUES(%s, %s, %s)'''
         params = (name, password, 0)
         self.execute(query, params)
+
+    def get_user_by_id(self, user_id):
+        query = '''
+        SELECT * FROM users where id = %s
+        '''
+        params = (user_id,)
+        return self.select_one(query, params)

@@ -13,6 +13,9 @@ class PostManager(BaseManager):
         p.user_agent = row[3]
         p.ip = row[4]
         p.user_id = row[5]
+        if len(row) > 6:
+            p.username = row[6]
+
         return p
 
     def add_post(self, item):
@@ -35,14 +38,6 @@ class PostManager(BaseManager):
         params = (id,)
         return self.select_one(query, params)
 
-    def all_user_posts(self, id):
-        query = '''
-        SELECT * FROM posts
-        WHERE user_id = %s order by post_id
-        '''
-        params = (id,)
-        return self.select_all(query, params)
-
     def update_post(self, item):
         query = '''
         UPDATE posts SET post = %s, date_time = %s, user_agent = %s, ip = %s
@@ -64,7 +59,8 @@ class PostManager(BaseManager):
         else:
             # all posts
             query = '''
-            SELECT * FROM posts ORDER by post_id
+            select p.post_id, p.post, p.date_time, p.user_agent, p.ip, p.user_id, u.username as u_name
+            from posts p join users u on p.user_id = u.id ORDER by post_id
             limit %s offset %s'''
             query_count = '''
             SELECT COUNT (*) FROM posts

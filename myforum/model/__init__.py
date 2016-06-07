@@ -8,7 +8,7 @@ class Comment(object):
 class User(object):
 	def __init__(self):
 		self.id = None
-		self.user_name = None
+		self.username = None
 		self.password = None
 		self.admin_mod = None
 

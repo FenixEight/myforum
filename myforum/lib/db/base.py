@@ -51,11 +51,15 @@ class BaseManager:
             params = (u_id,)
             posts_count = self.count_helper(query_count, params)
             pages, limit, offset = self.pagination_hepler(page, posts_count)
+            if offset < 0:
+                return None, 0
             q_params = (u_id, limit, offset,)
             return self.select_all(query, q_params), pages
         else:
             posts_count = self.count_helper(query_count)
             pages, limit, offset = self.pagination_hepler(page, posts_count)
+            if offset < 0:
+                return None, 0
             q_params = (limit, offset,)
             return self.select_all(query, q_params), pages
 

@@ -6,7 +6,7 @@
 ${self.head_content()}
 
 </head>
-<body>
+
 <div>
 	<div class="header">
 		<div style="width: 60%; margin: 0 auto; text-align: left;">
@@ -25,18 +25,24 @@ ${self.head_content()}
 			</div>
 		</div>
 	</div>
+	<div class="container">
+	    <% messages = get_flashed_messages()
+	    %>
+        % for message in messages:
+		    ${ message }
+        %endfor
+</div>
 	<div class="page-content">
 		${self.page_content()}
 	</div>
 </div>
+
 </body>
 
 </html>
 
-
 <%def name="head_content()">
 </%def>
-
 
 <%def name="page_content()">
 </%def>

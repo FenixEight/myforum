@@ -3,7 +3,7 @@
 
 <%def name="page_content()">
 
-<h1>Comments</h1>
+<h1>Posts:</h1>
 %if posts:
 	${self.posts_content()}
 %else:
@@ -29,10 +29,12 @@
 		<div class="ip">${p.ip}</div>
 	</div>
 %endfor
+
 %if page != pages:
-		<a href="${url_for('user', username = username, page = page +1)}">Next</a>
-		%endif
-		%if page !=1:
-		<a href="${url_for('user', username = username, page = page -1)}">Previos</a>
-		%endif
+    <a href="${url_for('user', username = username, page = page +1)}">Next</a>
+%endif
+
+%if page !=1:
+    <a href="${url_for('user', username = username, page = page -1)}">Previos</a>
+%endif
 </%def>
