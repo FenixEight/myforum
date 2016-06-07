@@ -26,10 +26,10 @@ class PostManager(BaseManager):
         params = (item.post, item.date_time, item.user_agent, item.ip, item.user_id)
         self.execute(query, params)
 
-    def delete_post(self, id):
+    def delete_post(self, id, user_id, admin_mod):
         query = '''
-        DELETE FROM "posts" WHERE post_id = %s'''
-        params = (id,)
+        DELETE FROM "posts" WHERE post_id = %s and user_id = %s or post_id = %s and 1=%s'''
+        params = (id,user_id,id,admin_mod,)
         self.execute(query, params)
 
     def get_by_id(self, id):
@@ -38,11 +38,12 @@ class PostManager(BaseManager):
         params = (id,)
         return self.select_one(query, params)
 
-    def update_post(self, item):
+    def update_post(self, item, user_id, admin_mod):
         query = '''
         UPDATE posts SET post = %s, date_time = %s, user_agent = %s, ip = %s
-        WHERE post_id = %s'''
-        params = (item.post, item.date_time, item.user_agent, item.ip, item.post_id)
+        WHERE post_id = %s and user_id = %s or post_id = %s and 1=%s '''
+        params = (item.post, item.date_time, item.user_agent, item.ip, item.post_id, user_id,
+                  item.post_id, admin_mod,)
         self.execute(query, params)
 
     def get_posts(self, page=1, u_id=0):
@@ -66,5 +67,3 @@ class PostManager(BaseManager):
             SELECT COUNT (*) FROM posts
             '''
             return self.paginate(query, query_count, page)
-
-

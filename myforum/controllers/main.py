@@ -4,10 +4,6 @@ from flask import request, session, redirect, url_for, flash
 from myforum import app
 from myforum.lib.template import render
 
-
-def get_user(name):
-    return app.db.user.get_username_by_name(name)
-
 @app.route('/')
 @app.route('/page<int:page>')
 def home(page=1):
@@ -68,7 +64,7 @@ def logout():
 
 @app.route('/<username>/posts/page<int:page>')
 def user(username, page):
-    u = get_user(username)
+    u = app.db.user.get_username_by_name(username)
     posts, pages = app.db.post.get_posts(page, u_id=u.id)
     return render('user', posts=posts, pages=pages, page=page, username=username)
 
