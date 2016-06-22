@@ -35,10 +35,6 @@ class BaseManager:
                     return self.convert_rows(rows, convert_func)
             elif fetch == 'scalar':
                 row = cursor.fetchone()
-<<<<<<< HEAD
-                print(row)
-=======
->>>>>>> 425cf83bedb4bd1a867ebc062e1a22a8d3bab983
                 if row:
                     return row[0]
         finally:
