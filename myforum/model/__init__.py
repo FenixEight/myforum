@@ -21,6 +21,11 @@ class Post(object):
 		self.ip = None
 		self.user_id = None
 
+class Tag(object):
+	def __init__(self):
+		self.tag_id = None
+		self.tag = None
+
 
 
 

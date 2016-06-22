@@ -7,8 +7,18 @@ from myforum.lib.template import render
 @app.route('/')
 @app.route('/page<int:page>')
 def home(page=1):
-    posts, pages = app.db.post.get_posts(page=page)
+    posts, pages = app.db.post.get_all_posts(page=page)
+    if posts:
+        for i in range(len(posts)):
+            posts[i].tags = app.db.tag.get_tags_by_post_id(posts[i].post_id)
     return render('home', posts=posts, page=page, pages=pages)
+
+@app.route('/tag/<tag>/page<int:page>')
+def tag(tag, page=1):
+    t = app.db.tag.search_tag(tag)
+    posts, pages = app.db.post.get_posts_by_tag(t.tag_id, page)
+    return render('tag', page = page, posts = posts, pages = pages)
+
 
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
@@ -65,7 +75,7 @@ def logout():
 @app.route('/<username>/posts/page<int:page>')
 def user(username, page):
     u = app.db.user.get_username_by_name(username)
-    posts, pages = app.db.post.get_posts(page, u_id=u.id)
+    posts, pages = app.db.post.get_user_posts(page, u.id)
     return render('user', posts=posts, pages=pages, page=page, username=username)
 
 @app.context_processor

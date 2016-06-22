@@ -22,10 +22,12 @@
 	<form method="post" action="${url_for('add_comment')}">
 		<h2>Post your comment</h2>
 		<div class="input-section">
-		</div>
-		<div class="input-section">
 			<label>Your comment</label>
 			<textarea name="comment_text"></textarea>
+		</div>
+		<div class="input-section">
+			<label>Tags</label>
+			<textarea name="tags"></textarea>
 		</div>
 		<input type="submit" value="Post comment" />
 	</form>
@@ -48,6 +50,9 @@
 		</div>
 		<div class="comment-text">${p.post}</div>
 		<div class="ip">${p.ip}</div>
+		%for t in p.tags:
+		<div><a href="${url_for('tag', tag = t.tag, page = 1)} ">${t.tag}</a></div>
+		%endfor
 	</div>
 %endfor
 

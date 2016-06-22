@@ -8,6 +8,7 @@ from psycopg2.pool import ThreadedConnectionPool
 from myforum.lib.db.comment import CommentManager
 from myforum.lib.db.user import UserManager
 from myforum.lib.db.post import PostManager
+from myforum.lib.db.tag import TagManager
 
 
 class DataService:
@@ -16,6 +17,7 @@ class DataService:
 		self.comment = CommentManager(self)
 		self.user = UserManager(self)
 		self.post = PostManager(self)
+		self.tag = TagManager(self)
 
 	def get_connection(self):
 		return psycopg2.connect(self.connection_string)

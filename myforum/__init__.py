@@ -18,7 +18,7 @@ from myforum.controllers import comment
 
 
 
-connection_string = "host='localhost' port=5432 dbname='postgres' user='postgres' password='0932512759'"
+connection_string = "host='localhost' port=5432 dbname='myforum' user='postgres' password='0932512759'"
 
 
 app.db = DataService(connection_string)

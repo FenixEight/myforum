@@ -2,7 +2,7 @@
 
 
 <%def name="page_content()">
-%if is_auth:
+%if is_auth and p:
 % if current_user.id == p.user_id or current_user.admin_mod==1:
 <h1>Delete this post?</h1>
 

@@ -10,6 +10,10 @@
 		<label>Your comment</label>
 		<textarea name="comment_text">${c.post}</textarea>
 	</div>
+	<div class="input-section">
+		<label>Tags</label>
+		<textarea name="tags">${tag_string}</textarea>
+	</div>
 	<input type="submit" value="Save changes">
 	- <a href="${url_for('home')}">Cancel</a>
 </form>

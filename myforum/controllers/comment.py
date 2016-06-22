@@ -17,15 +17,32 @@ def get_post(req):
     c.user_id = u.id
     return c
 
+
 @app.route('/comments/add', methods=['POST'])
 def add_comment():
     if request.method == 'POST':
         c = get_post(request)
+        tags_str = request.form['tags']
+        tags = tags_str.split(' ')
+        tags = list(set(tags))
+        if '' in tags:
+            tags.remove('')
         if len(c.post) < 6:
             flash('Too short message')
             return render('home')
-        app.db.post.add_post(c)
+        if not tags:
+            flash('One tag minimum')
+            return redirect(url_for('home'))
+        for t in tags:
+            if len(t)>32:
+                flash('Max tag length 32')
+                return redirect(url_for('home'))
+
+        post_id = app.db.post.add_post(c)
+        for t in tags:
+            app.db.tag.add(t, post_id)
         return redirect(url_for('home'))
+
 
 @app.route('/comments/edit/<int:post_id>', methods=['GET', 'POST'])
 def edit_comment(post_id):
@@ -38,22 +55,39 @@ def edit_comment(post_id):
         if len(c.post) < 6:
             flash('Too short message')
             return render('edit_comment', c=c)
+        tags_str = request.form['tags']
+        tags = tags_str.split(' ')
+        tags = list(set(tags))
+        if '' in tags:
+            tags.remove('')
+        for t in tags:
+            if len(t)>32:
+                flash('Max tag length 32')
+                return redirect(url_for('home'))
+        app.db.tag.delete_links(post_id)
+        for t in tags:
+            app.db.tag.add(t, post_id)
         u = app.db.user.get_username_by_name(session['username'])
         app.db.post.update_post(c, u.id, u.admin_mod)
         return redirect(url_for('home'))
     else:
+        tags = app.db.tag.get_tags_by_post_id(post_id)
+        tags_list = []
+        for t in tags:
+            tags_list.append(t.tag)
+        tag_string = ' '.join(tags_list)
         post = app.db.post.get_by_id(post_id)
-        return render('edit_comment', c=post)
+        return render('edit_comment', c=post, tag_string=tag_string)
+
 
 @app.route('/comments/delete/<int:post_id>', methods=['GET', 'POST'])
 def delete_comment(post_id):
     if request.method == 'POST':
         if 'username' in session:
             u = app.db.user.get_username_by_name(session['username'])
+            app.db.tag.delete_links(post_id)
             app.db.post.delete_post(post_id, u.id, u.admin_mod)
-        return redirect(url_for('home'))
+            return redirect(url_for('home'))
     else:
         p = app.db.post.get_by_id(post_id)
         return render('delete_comment', p=p)
-
-

@@ -17,4 +17,13 @@ ip varchar,
 user_id int references users(id)
 );
 
+CREATE SEQUENCE seq_tags MINVALUE 1;
+create table tags(tag_id int not null default
+ nextval('"seq_tags"'::text) primary key,
+ tag varchar);
 
+CREATE SEQUENCE seq_post_tag MINVALUE 1;
+create table post_tag(
+id int not null default nextval('"seq_post_tag"'::text) primary key,
+post_id int references posts(post_id),
+tag_id int references tags(tag_id));

@@ -1,8 +1,6 @@
 from myforum.lib.db.base import BaseManager
 from myforum.model import Post
 
-per_page = 3
-
 
 class PostManager(BaseManager):
     def convert_row(self, row):
@@ -15,16 +13,15 @@ class PostManager(BaseManager):
         p.user_id = row[5]
         if len(row) > 6:
             p.username = row[6]
-
         return p
 
     def add_post(self, item):
         query = '''
         INSERT INTO posts(post, date_time, user_agent, ip, user_id)
-        VALUES(%s, %s, %s, %s, %s)
+        VALUES(%s, %s, %s, %s, %s) returning post_id
         '''
         params = (item.post, item.date_time, item.user_agent, item.ip, item.user_id)
-        self.execute(query, params)
+        return self.select_scalar(query, params)
 
     def delete_post(self, id, user_id, admin_mod):
         query = '''
@@ -46,24 +43,37 @@ class PostManager(BaseManager):
                   item.post_id, admin_mod,)
         self.execute(query, params)
 
-    def get_posts(self, page=1, u_id=0):
-        if u_id:
-            # by user id
-            query = '''
-            SELECT * from posts where user_id = %s order by post_id limit %s offset %s
-            '''
-            query_count = '''
-            SELECT COUNT (*) FROM posts where user_id = %s
-            '''
-            return self.paginate(query, query_count, page, u_id)
-
-        else:
-            # all posts
-            query = '''
+    def get_all_posts(self, page):
+        query_count = '''
+        SELECT COUNT (*) FROM posts '''
+        query = '''
             select p.post_id, p.post, p.date_time, p.user_agent, p.ip, p.user_id, u.username as u_name
             from posts p join users u on p.user_id = u.id ORDER by post_id
             limit %s offset %s'''
-            query_count = '''
-            SELECT COUNT (*) FROM posts
-            '''
-            return self.paginate(query, query_count, page)
+        count_posts = self.count_helper(query_count)
+        pages, limit, offset = self.pagination_hepler(page, count_posts)
+        params = (limit, offset,)
+        return self.paginate(query, params, offset), pages
+
+    def get_user_posts(self, page, user_id):
+        query = '''
+        SELECT * from posts where user_id = %s order by post_id limit %s offset %s'''
+        query_count = '''
+        SELECT COUNT (*) FROM posts where user_id = %s
+        '''
+        count_posts = self.count_helper(query_count, (user_id,))
+        pages, limit, offset = self.pagination_hepler(page, count_posts)
+        params = (user_id, limit, offset,)
+        return self.paginate(query, params, offset), pages
+
+    def get_posts_by_tag(self, tag_id, page):
+        query_count = '''
+        select count (*) from posts where post_id in (select post_id from post_tag where tag_id = %s)'''
+        query = '''
+        select p.post_id, p.post, p.date_time, p.user_agent, p.ip, p.user_id, u.username as u_name
+        from posts p join users u on p.user_id = u.id where post_id in
+        (select post_id from post_tag where tag_id=%s) limit %s offset %s'''
+        count_posts = self.count_helper(query_count, (tag_id,))
+        pages, limit, offset = self.pagination_hepler(page, count_posts)
+        params = (tag_id, limit, offset,)
+        return self.paginate(query, params, offset),pages
