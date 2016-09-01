@@ -3,32 +3,53 @@
 
 <%def name="page_content()">
 
-<h1>Posts:</h1>
+
+%if is_auth:
+%if current_user.admin_mod == 1 and admin_mod != 1:
+    <form method="post" action="${url_for('ban', username = username)}">
+		%if admin_mod == 0:
+		<input type="submit" name="button_1" value="Ban user" />
+		%else:
+		<input type="submit" name="button_2" value="Unban user" />
+		%endif
+	</form>
+%endif
+%if blacklist != 'current':
+    ${blacklist}
+    <form method="post" action="${url_for('ban', username = username)}">
+		%if blacklist == True :
+		<input type="submit" name="button_3" value="Remove from blacklist" />
+		%else:
+		<input type="submit" name="button_4" value="Add to blacklist" />
+		%endif
+	</form>
+%endif
 %if posts:
+<h1>Posts:</h1>
 	${self.posts_content()}
 %else:
 	No posts yet.
+%endif
+%else:
+You can`t do this!
+<a href="${url_for('home')}">Home</a>
 %endif
 
 </%def>
 
 <%def name="posts_content()">
+
 %for p in posts:
-	<div class="post">
-		<div class="user-name">${username}</div>
-		<div class="creation-date">
-			${p.date_time}
-			%if is_auth:
-			% if p.user_id == current_user.id or current_user.admin_mod == 1:
-			    - <a href="${url_for('edit_comment', post_id=p.post_id)}">edit</a>
-			    - <a href="${url_for('delete_comment', post_id=p.post_id)} ">Delete</a>
-			%endif
-			%endif
-		</div>
-		<div class="comment-text">${p.post}</div>
-		<div class="ip">${p.ip}</div>
-	</div>
+    %if p.status != 'banned':
+    %if current_user.id != p.user_id and p.status == 'approved' or current_user.admin_mod == 1:
+	    ${self.posts_helper(p)}
+    %endif
+    %if current_user.id == p.user_id:
+        ${self.posts_helper(p)}
+    %endif
+    %endif
 %endfor
+
 
 %if page != pages:
     <a href="${url_for('user', username = username, page = page +1)}">Next</a>
@@ -37,4 +58,30 @@
 %if page !=1:
     <a href="${url_for('user', username = username, page = page -1)}">Previos</a>
 %endif
+</%def>
+
+<%def name="posts_helper(p)">
+<div class="post">
+		<div class="user-name">${username}</div>
+		<div class="creation-date">
+			${p.date_time}
+			%if is_auth:
+			% if p.user_id == current_user.id or current_user.admin_mod == 1:
+			%if p.status != 'Approved':
+			<h5>Post moderation status:</h5> ${p.status}
+			%endif
+			    - <a href="${url_for('edit_comment', post_id=p.post_id)}">edit</a>
+			    - <a href="${url_for('delete_comment', post_id=p.post_id)} ">Delete</a>
+			    %if p.status == 'waiting' and current_user.admin_mod == 1:
+			        <form method="post" action="${url_for('moderation', post_id=p.post_id)}">
+			            <input type="submit" name="button_1" value="Approve" />
+			            <input type="submit" name="button_2" value="Cancel" />
+				    </form>
+			    %endif
+			%endif
+			%endif
+		</div>
+		<div class="comment-text">${p.post}</div>
+		<div class="ip">${p.ip}</div>
+	</div>
 </%def>

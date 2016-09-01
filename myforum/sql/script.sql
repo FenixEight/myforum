@@ -1,5 +1,8 @@
 CREATE SEQUENCE seq_users MINVALUE 1;
 CREATE SEQUENCE seq_comments MINVALUE 1;
+CREATE SEQUENCE seq_tags MINVALUE 1;
+CREATE SEQUENCE seq_post_tag MINVALUE 1;
+CREATE SEQUENCE seq_ban MINVALUE 1;
 
 CREATE TABLE "users"(
 id int not null default nextval('"seq_users"'::text) primary key,
@@ -14,16 +17,26 @@ post varchar,
 date_time varchar,
 user_agent varchar,
 ip varchar,
-user_id int references users(id)
+user_id int references users(id),
+status varchar
 );
 
-CREATE SEQUENCE seq_tags MINVALUE 1;
+
 create table tags(tag_id int not null default
  nextval('"seq_tags"'::text) primary key,
  tag varchar);
 
-CREATE SEQUENCE seq_post_tag MINVALUE 1;
+
 create table post_tag(
 id int not null default nextval('"seq_post_tag"'::text) primary key,
 post_id int references posts(post_id),
 tag_id int references tags(tag_id));
+
+CREATE TABLE params(param varchar, status varchar);
+insert into params(param, status) values('moderation', 'off');
+
+create table ban(
+id int not null default nextval('"seq_ban"'::text) primary key,
+username int,
+username_banned int)
+

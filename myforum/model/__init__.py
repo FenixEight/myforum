@@ -20,6 +20,7 @@ class Post(object):
 		self.user_agent = None
 		self.ip = None
 		self.user_id = None
+		self.status = None
 
 class Tag(object):
 	def __init__(self):

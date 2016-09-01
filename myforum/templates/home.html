@@ -4,7 +4,7 @@
 <%def name="page_content()">
 
 <h1>Comments</h1>
-%if posts:
+%if posts and is_auth:
 	${self.posts_content()}
 %else:
 	<p>No posts yet.</p>
@@ -13,7 +13,11 @@
 %if not is_auth:
     <p>You need a registration</p>
 %else:
-     ${self.post_form()}
+	%if current_user.admin_mod == -1:
+       <h3>You have been banned. You can call to SPORTLOTO to resolve this problem.</h3>
+    %else:
+        ${self.post_form()}
+    %endif
 %endif
 
 </%def>

@@ -9,7 +9,7 @@ from myforum.lib.db.comment import CommentManager
 from myforum.lib.db.user import UserManager
 from myforum.lib.db.post import PostManager
 from myforum.lib.db.tag import TagManager
-
+from myforum.lib.db.admin import AdminManager
 
 class DataService:
 	def __init__(self, connection_string):
@@ -18,6 +18,7 @@ class DataService:
 		self.user = UserManager(self)
 		self.post = PostManager(self)
 		self.tag = TagManager(self)
+		self.admin = AdminManager(self)
 
 	def get_connection(self):
 		return psycopg2.connect(self.connection_string)

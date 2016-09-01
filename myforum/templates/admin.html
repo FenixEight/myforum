@@ -1,0 +1,61 @@
+<%inherit file="base.html"/>
+
+
+<%def name="page_content()">
+%if is_auth:
+    % if current_user.admin_mod==1:
+       ${self.post_form()}
+	%if posts:
+    	${self.posts_content()}
+	%else:
+   		<h5>No posts for moderation</h5>
+	%endif
+	%else:
+You can`t do this!
+<a href="${url_for('home')}">Home</a>
+%endif
+%else:
+You can`t do this!
+<a href="${url_for('home')}">Home</a>
+%endif
+</%def>
+
+<%def name="post_form()">
+	<form method="post" action="${url_for('admin')}">
+		%if moderation:
+		<h2>Moderation status: ON</h2>
+		<input type="submit" name="button_1" value="Switch off" />
+		%else:
+		<h2>Moderation status: OFF</h2>
+		<input type="submit" name="button_2" value="Switch on" />
+		%endif
+	</form>
+</%def>
+
+<%def name="posts_content()">
+%for p in posts:
+	<div class="post">
+		<div class="user-name">
+		Username: <a href="${url_for('user', username = p.username, page = 1)}">${p.username}</a>
+		</div>
+		<div class="creation-date">	Time: ${p.date_time}</div>
+		<div class="comment-text">${p.post}</div>
+		<div class="ip">${p.ip}</div>
+		%for t in p.tags:
+		<div><a href="${url_for('tag', tag = t.tag, page = 1)} ">${t.tag}</a></div>
+		%endfor
+		<form method="post" action="${url_for('moderation', post_id=p.post_id)}">
+			<input type="submit" name="button_1" value="Approve" />
+			<input type="submit" name="button_2" value="Cancel" />
+		</form>
+	</div>
+%endfor
+
+%if page != pages:
+    <a href="${url_for('admin', page = page +1)}">Next</a>
+%endif
+
+%if page !=1:
+    <a href="${url_for('admin', page = page -1)}">Previos</a>
+%endif
+</%def>

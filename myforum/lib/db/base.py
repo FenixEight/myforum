@@ -60,6 +60,7 @@ class BaseManager:
 
     def pagination_hepler(self, page, posts_count):
         pages, sep = divmod(posts_count, PER_PAGE)
+        print(pages,sep)
         if sep:
             pages += 1
         if page == pages and sep != 0:

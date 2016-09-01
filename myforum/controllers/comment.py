@@ -15,6 +15,11 @@ def get_post(req):
     c.ip = req.remote_addr
     u = app.db.user.get_username_by_name(session['username'])
     c.user_id = u.id
+    c.status = 'approved'
+    if app.db.admin.mod_status() == 'on':
+        c.status = 'waiting'
+    if u.admin_mod == 1:
+        c.status = 'approved'
     return c
 
 
@@ -34,7 +39,7 @@ def add_comment():
             flash('One tag minimum')
             return redirect(url_for('home'))
         for t in tags:
-            if len(t)>32:
+            if len(t) > 32:
                 flash('Max tag length 32')
                 return redirect(url_for('home'))
 
@@ -61,13 +66,19 @@ def edit_comment(post_id):
         if '' in tags:
             tags.remove('')
         for t in tags:
-            if len(t)>32:
+            if len(t) > 32:
                 flash('Max tag length 32')
                 return redirect(url_for('home'))
         app.db.tag.delete_links(post_id)
         for t in tags:
             app.db.tag.add(t, post_id)
         u = app.db.user.get_username_by_name(session['username'])
+        c.status = 'approved'
+        print
+        if app.db.admin.mod_status() == 'on':
+            c.status = 'waiting'
+        if u.admin_mod == 1:
+            c.status = 'approved'
         app.db.post.update_post(c, u.id, u.admin_mod)
         return redirect(url_for('home'))
     else:
@@ -91,3 +102,12 @@ def delete_comment(post_id):
     else:
         p = app.db.post.get_by_id(post_id)
         return render('delete_comment', p=p)
+
+
+@app.route('/admin/moderation/<int:post_id>', methods=['POST'])
+def moderation(post_id):
+    if request.form.get('button_1', '') == 'Approve':
+            app.db.admin.approve_post(post_id)
+    if request.form.get('button_2', '') == 'Cancel':
+        app.db.admin.cancel_post(post_id)
+    return redirect(url_for('admin'))
