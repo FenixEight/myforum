@@ -24,9 +24,20 @@
 		%endif
 	</form>
 %endif
+%if current_user.username == username:
+<h3> Download photo:</h3>
+    <form action="${url_for('avatar')}" method=post enctype=multipart/form-data>
+        <p><input type=file name=file>
+         <input type="submit" name="download" value="Upload">
+		%if current_user.has_photo:
+			<input type="submit" name="del" value="Delete">
+		%endif
+    </form>
+%endif
+<div><img src=${self.avatar_helper(False,has_photo,username)} alt="text"></div>
 %if posts:
 <h1>Posts:</h1>
-	${self.posts_content()}
+	${self.posts_func('user',posts,page,pages,username=username)}
 %else:
 	No posts yet.
 %endif
@@ -37,51 +48,3 @@ You can`t do this!
 
 </%def>
 
-<%def name="posts_content()">
-
-%for p in posts:
-    %if p.status != 'banned':
-    %if current_user.id != p.user_id and p.status == 'approved' or current_user.admin_mod == 1:
-	    ${self.posts_helper(p)}
-    %endif
-    %if current_user.id == p.user_id:
-        ${self.posts_helper(p)}
-    %endif
-    %endif
-%endfor
-
-
-%if page != pages:
-    <a href="${url_for('user', username = username, page = page +1)}">Next</a>
-%endif
-
-%if page !=1:
-    <a href="${url_for('user', username = username, page = page -1)}">Previos</a>
-%endif
-</%def>
-
-<%def name="posts_helper(p)">
-<div class="post">
-		<div class="user-name">${username}</div>
-		<div class="creation-date">
-			${p.date_time}
-			%if is_auth:
-			% if p.user_id == current_user.id or current_user.admin_mod == 1:
-			%if p.status != 'Approved':
-			<h5>Post moderation status:</h5> ${p.status}
-			%endif
-			    - <a href="${url_for('edit_comment', post_id=p.post_id)}">edit</a>
-			    - <a href="${url_for('delete_comment', post_id=p.post_id)} ">Delete</a>
-			    %if p.status == 'waiting' and current_user.admin_mod == 1:
-			        <form method="post" action="${url_for('moderation', post_id=p.post_id)}">
-			            <input type="submit" name="button_1" value="Approve" />
-			            <input type="submit" name="button_2" value="Cancel" />
-				    </form>
-			    %endif
-			%endif
-			%endif
-		</div>
-		<div class="comment-text">${p.post}</div>
-		<div class="ip">${p.ip}</div>
-	</div>
-</%def>

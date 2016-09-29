@@ -1,3 +1,4 @@
+import sys
 from myforum.lib.db.base import BaseManager
 from myforum.model import Post
 
@@ -14,6 +15,8 @@ class PostManager(BaseManager):
         p.status = row[6]
         if len(row) > 7:
             p.username = row[7]
+        if len(row) > 8:
+            p.has_photo = row[8]
         return p
 
     def add_post(self, item):
@@ -48,7 +51,7 @@ class PostManager(BaseManager):
         query_count = '''
         SELECT COUNT (*) FROM posts where status = 'approved' '''
         query = '''
-            select p.post_id, p.post, p.date_time, p.user_agent, p.ip, p.user_id,p.status, u.username as u_name
+            select p.post_id, p.post, p.date_time, p.user_agent, p.ip, p.user_id,p.status, u.username, u.has_photo as u_name
             from posts p join users u on p.user_id = u.id where p.status = 'approved' and user_id not in
         (select username_banned from ban where username = %s) ORDER by post_id
             limit %s offset %s'''
@@ -59,7 +62,7 @@ class PostManager(BaseManager):
 
     def posts_for_moderation(self, page):
         query_count = '''SELECT COUNT (*) FROM posts WHERE status = 'waiting' '''
-        query = '''select p.post_id, p.post, p.date_time, p.user_agent, p.ip, p.user_id,p.status, u.username as u_name
+        query = '''select p.post_id, p.post, p.date_time, p.user_agent, p.ip, p.user_id,p.status, u.username, u.has_photo as u_name
             from posts p join users u on p.user_id = u.id where p.status = 'waiting' ORDER by post_id
             limit %s offset %s '''
         count_posts = self.count_helper(query_count)
@@ -80,12 +83,14 @@ class PostManager(BaseManager):
 
     def get_posts_by_tag(self, tag_id, page):
         query_count = '''
-        select count (*) from posts where post_id in (select post_id from post_tag where tag_id = %s)'''
+        select count (*) from posts where status = 'approved' and post_id in (select post_id from post_tag where tag_id = %s)'''
         query = '''
-        select p.post_id, p.post, p.date_time, p.user_agent, p.ip, p.user_id, p.status, u.username as u_name
-        from posts p join users u on p.user_id = u.id where status = 'approved' and post_id in
+        select p.post_id, p.post, p.date_time, p.user_agent, p.ip, p.user_id, p.status, u.username, u.has_photo
+        as u_name from posts p join users u on p.user_id = u.id where status = 'approved' and post_id in
         (select post_id from post_tag where tag_id=%s) limit %s offset %s'''
         count_posts = self.count_helper(query_count, (tag_id,))
+        print (count_posts, sys.stderr)
         pages, limit, offset = self.pagination_hepler(page, count_posts)
+        print(pages, limit, offset)
         params = (tag_id, limit, offset,)
         return self.paginate(query, params, offset), pages

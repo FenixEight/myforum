@@ -34,7 +34,7 @@ def add_comment():
             tags.remove('')
         if len(c.post) < 6:
             flash('Too short message')
-            return render('home')
+            return redirect(url_for('home'))
         if not tags:
             flash('One tag minimum')
             return redirect(url_for('home'))

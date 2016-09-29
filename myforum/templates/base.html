@@ -49,3 +49,77 @@ ${self.head_content()}
 
 <%def name="page_content()">
 </%def>
+
+<%def name="posts_func(mode, posts, page, pages, username=None, tag=None)">
+%for p in posts:
+    %if mode == 'user':
+        %if current_user.id != p.user_id and p.status !='approved':
+           <%continue%>
+        %endif
+    %endif
+	<div class="post">
+		%if mode != 'user':
+        <div><img src=${self.avatar_helper(True,p.has_photo,p.username)} alt="text"></div>
+		    <div class="user-name">
+			    <a href="${url_for('user', username = p.username, page = 1)}">${p.username}</a>
+		    </div>
+		%endif
+		<div class="creation-date">${p.date_time}</div>
+
+			%if is_auth:
+			    % if p.status == 'approved' and p.user_id == current_user.id or current_user.admin_mod == 1:
+			        - <a href="${url_for('edit_comment', post_id=p.post_id)}">edit</a>
+			        - <a href="${url_for('delete_comment', post_id=p.post_id)} ">Delete</a>
+			    %endif
+			%endif
+        %if mode == 'user' and current_user.id == p.user_id:
+		     <h5>Post moderation status:</h5> ${p.status}
+        %endif
+		<div class="comment-text">${p.post}</div>
+		%if mode != 'tag':
+		    %for t in p.tags:
+		        <div><a href="${url_for('tag', tag = t.tag, page = 1)} ">${t.tag}</a></div>
+		    %endfor
+		%endif
+	</div>
+%endfor
+
+
+%if page != pages:
+<a href="${get_page_url(mode, page +1)}">Next</a>
+%endif
+
+%if page !=1:
+<a href="${get_page_url(mode, page - 1)}">Previous</a>
+%endif
+</%def>
+
+<%def name="get_page_url(mode, pagenum)">
+    <%
+    if mode == 'home':
+        return url_for('home', page = pagenum)
+    elif mode == 'user':
+       return url_for('user', username = username, page = pagenum)
+    elif mode == 'tag':
+        return url_for('tag', tag = tag, page = pagenum)
+%>
+</%def>
+
+<%def name="avatar_helper(thumb,has_photo,username)">
+<%
+av_placeholder = avatar_path + 'placeholder.jpg'
+th_placeholder = avatar_path + 'placeholder_thumb.jpg'
+avatar = ''
+if has_photo:
+    if thumb:
+        avatar = avatar_path + 'thumb_' + username + '.jpg'
+    else:
+        avatar =  avatar_path + username + '.jpg'
+else:
+    if thumb:
+        avatar = th_placeholder
+    else:
+       avatar = av_placeholder
+return avatar
+%>
+</%def>

@@ -11,6 +11,7 @@ class User(object):
 		self.username = None
 		self.password = None
 		self.admin_mod = None
+		self.has_photo = None
 
 class Post(object):
 	def __init__(self):

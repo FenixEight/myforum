@@ -8,7 +8,8 @@ CREATE TABLE "users"(
 id int not null default nextval('"seq_users"'::text) primary key,
 username varchar(128),
 password varchar,
-admin_mod int
+admin_mod int,
+has_photo boolean
 );
 
 CREATE TABLE "posts"(

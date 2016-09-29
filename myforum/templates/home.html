@@ -5,7 +5,7 @@
 
 <h1>Comments</h1>
 %if posts and is_auth:
-	${self.posts_content()}
+	${self.posts_func('home',posts,page,pages)}
 %else:
 	<p>No posts yet.</p>
 %endif
@@ -35,37 +35,5 @@
 		</div>
 		<input type="submit" value="Post comment" />
 	</form>
-</%def>
-
-<%def name="posts_content()">
-%for p in posts:
-	<div class="post">
-		<div class="user-name">
-			<a href="${url_for('user', username = p.username, page = 1)}">${p.username}</a>
-		</div>
-		<div class="creation-date">
-			${p.date_time}
-			%if is_auth:
-			% if p.user_id == current_user.id or current_user.admin_mod == 1:
-			    - <a href="${url_for('edit_comment', post_id=p.post_id)}">edit</a>
-			    - <a href="${url_for('delete_comment', post_id=p.post_id)} ">Delete</a>
-			%endif
-			%endif
-		</div>
-		<div class="comment-text">${p.post}</div>
-		<div class="ip">${p.ip}</div>
-		%for t in p.tags:
-		<div><a href="${url_for('tag', tag = t.tag, page = 1)} ">${t.tag}</a></div>
-		%endfor
-	</div>
-%endfor
-
-%if page != pages:
-    <a href="${url_for('home', page = page +1)}">Next</a>
-%endif
-
-%if page !=1:
-    <a href="${url_for('home', page = page -1)}">Previos</a>
-%endif
 </%def>
 

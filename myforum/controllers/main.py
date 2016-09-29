@@ -1,8 +1,12 @@
+import os
 import random
 from string import ascii_letters, digits
 from flask import request, session, redirect, url_for, flash
 from myforum import app
 from myforum.lib.template import render
+from PIL import Image
+
+
 
 
 @app.route('/')
@@ -24,9 +28,10 @@ def home(page=1):
 def tag(tag, page=1):
     t = app.db.tag.search_tag(tag)
     if not t:
-         return render('tag', tag = tag)
+        return render('tag', tag = tag)
     posts, pages = app.db.post.get_posts_by_tag(t.tag_id, page)
-    return render('tag', page=page, posts=posts, pages=pages)
+    print posts
+    return render('tag', tag=tag, page=page, posts=posts, pages=pages)
 
 @app.route('/ban/<username>', methods=['POST', 'GET'])
 def ban(username):
@@ -47,12 +52,10 @@ def ban(username):
 @app.route('/admin', methods=['GET', 'POST'])
 def admin(page=1):
     if request.method == 'POST':
-
         if request.form.get('button_1', '') == 'Switch off':
             app.db.admin.mod_off()
         if request.form.get('button_2', '') == 'Switch on':
             app.db.admin.mod_on()
-
         return render('admin', page=page)
     else:
         posts, pages = app.db.post.posts_for_moderation(page)
@@ -118,7 +121,7 @@ def logout():
 
 
 @app.route('/<username>/posts/page<int:page>')
-def user(username, page):
+def user(username, page=1):
     if not app.db.user.get_username_by_name(username):
         flash('Wrong page')
         return redirect(url_for('home'))
@@ -131,7 +134,39 @@ def user(username, page):
         else:
             blacklist = False
     posts, pages = app.db.post.get_user_posts(page, u.id)
-    return render('user', posts=posts, pages=pages, page=page, username=username, admin_mod=u.admin_mod, blacklist=blacklist)
+    if posts:
+        for i in range(len(posts)):
+            posts[i].tags = app.db.tag.get_tags_by_post_id(posts[i].post_id)
+
+    return render('user', posts=posts, pages=pages, page=page, username=username, admin_mod=u.admin_mod,
+                  blacklist=blacklist, has_photo=u.has_photo)
+
+
+@app.route('/avatar', methods=['POST'])
+def avatar():
+    z = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
+    avatar_path = os.path.normpath(z) + "\\"
+    username = app.db.user.get_username_by_name(session['username'])
+    av_path = avatar_path + username.username + '.jpg'
+    th_path = avatar_path + 'thumb_' + username.username + '.jpg'
+    if request.form.get('download','') == 'Upload':
+        try:
+            im = Image.open(request.files['file'])
+            if username.has_photo:
+                os.remove(av_path)
+                os.remove(th_path)
+            im.thumbnail((200,200,))
+            im.save(av_path)
+            im.thumbnail((50,50,))
+            im.save(th_path)
+            app.db.user.photo_add(username.id)
+        except IOError:
+            flash('Invalid image')
+    if request.form.get('del','') == 'Delete':
+        os.remove(av_path)
+        os.remove(th_path)
+        app.db.user.photo_remove(username.id)
+    return redirect(url_for('user',username=username.username,page = 1))
 
 
 @app.context_processor
@@ -144,6 +179,5 @@ def inject_build_num():
     status = app.db.admin.mod_status()
     if status == 'on':
         moderation = True
-    print(is_auth)
     return dict(buildNum=random.randint(1, 123456), moderation=moderation,
-                is_auth=is_auth, current_user=current_user)
+                is_auth=is_auth, current_user=current_user, avatar_path=os.path.join('/', app.config['UPLOAD_FOLDER']))
