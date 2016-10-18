@@ -42,23 +42,42 @@ body{
 }
 
 .input-section textarea{
-	width: 100%;
+	width: 50%;
 	height: 150px;
 
 }
 
-.comment{
+.comment_form{
+display: none
+}
+
+.post{
+	
 	margin: 0 0 15px;
+	
+	
 }
 
-.comment .user-name{
+.post .user-name{
 	font-weight: bold;
+	float: left
+	
 }
 
-.comment .creation-date{
-	font-size: 12px;
+.post .creation-date{
+	margin:  0 10px 0;
+	float: left
 }
 
-.comment .creation-date a{
-	color: #333;
+.post .controls{
+    float: left
+}
+
+.post .avatar{
+    float: left
+    
+}
+
+.post .post-text{
+    margin: 50px 0px 20px
 }

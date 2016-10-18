@@ -12,8 +12,8 @@ UPLOAD_FOLDER = "static/avatars/"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 from myforum.lib.db import DataService
 from myforum.controllers import main
-from myforum.controllers import comment
-
+from myforum.controllers import posts
+from myforum.controllers import comments
 connection_string = "host='localhost' port=5432 dbname='myforum' user='postgres' password='0932512759'"
 
 app.db = DataService(connection_string)

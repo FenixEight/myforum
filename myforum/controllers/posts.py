@@ -1,7 +1,6 @@
 import random
 import datetime
 from flask import Flask, request, session, redirect, url_for, flash
-
 from myforum import app
 from myforum.lib.template import render
 from myforum.model import Post
@@ -23,8 +22,8 @@ def get_post(req):
     return c
 
 
-@app.route('/comments/add', methods=['POST'])
-def add_comment():
+@app.route('/posts/add', methods=['POST'])
+def add_post():
     if request.method == 'POST':
         c = get_post(request)
         tags_str = request.form['tags']
@@ -49,8 +48,8 @@ def add_comment():
         return redirect(url_for('home'))
 
 
-@app.route('/comments/edit/<int:post_id>', methods=['GET', 'POST'])
-def edit_comment(post_id):
+@app.route('/posts/edit/<int:post_id>', methods=['GET', 'POST'])
+def edit_post(post_id):
     if request.method == 'POST':
         c = app.db.post.get_by_id(post_id)
         c.post = request.form['comment_text']
@@ -91,8 +90,8 @@ def edit_comment(post_id):
         return render('edit_comment', c=post, tag_string=tag_string)
 
 
-@app.route('/comments/delete/<int:post_id>', methods=['GET', 'POST'])
-def delete_comment(post_id):
+@app.route('/posts/delete/<int:post_id>', methods=['GET', 'POST'])
+def delete_post(post_id):
     if request.method == 'POST':
         if 'username' in session:
             u = app.db.user.get_username_by_name(session['username'])
@@ -107,7 +106,23 @@ def delete_comment(post_id):
 @app.route('/admin/moderation/<int:post_id>', methods=['POST'])
 def moderation(post_id):
     if request.form.get('button_1', '') == 'Approve':
-            app.db.admin.approve_post(post_id)
+        app.db.admin.approve_post(post_id)
     if request.form.get('button_2', '') == 'Cancel':
         app.db.admin.cancel_post(post_id)
     return redirect(url_for('admin'))
+
+
+@app.route('/posts/<int:id>', methods=['GET'])
+def post_view(id):
+    post = [app.db.post.get_by_id(id)]
+    post[0].tags = app.db.tag.get_tags_by_post_id(post[0].post_id)
+    comments = app.db.comment.get_comments_tree(id)
+    return render('post', post=post, comments=comments)
+
+
+@app.route('/posts/flat/<int:id>', methods=['GET'])
+def flat_post_view(id):
+    post = [app.db.post.get_by_id(id)]
+    post[0].tags = app.db.tag.get_tags_by_post_id(post[0].post_id)
+    comments = app.db.comment.get_flat_comments(id)
+    return render('post', post=post, comments=comments, flat=True)

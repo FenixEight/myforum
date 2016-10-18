@@ -6,7 +6,7 @@
 % if current_user.id == p.user_id or current_user.admin_mod==1:
 <h1>Delete this post?</h1>
 
-    <form method="post" action="${url_for('delete_comment', post_id=p.post_id)}">
+    <form method="post" action="${url_for('delete_post', post_id=p.post_id)}">
         <input type="submit" value="Delete comment">
         <input type="button" value="Cancel">
     </form>

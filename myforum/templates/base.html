@@ -2,7 +2,16 @@
 <html>
 <head>
 <link href="/static/css/styles.css?${buildNum}" rel="stylesheet" type="text/css" />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
+<script>
+$(function(){
+    $('.show_form').on('click', function(e){
+        e.preventDefault();
+        $(this).next('.comment_form').show();
+    });
+});
+</script>
 ${self.head_content()}
 
 </head>
@@ -50,7 +59,7 @@ ${self.head_content()}
 <%def name="page_content()">
 </%def>
 
-<%def name="posts_func(mode, posts, page, pages, username=None, tag=None)">
+<%def name="posts_func(mode, posts, page, pages, username=None, tag=None, comments_link=True)">
 %for p in posts:
     %if mode == 'user':
         %if current_user.id != p.user_id and p.status !='approved':
@@ -59,7 +68,7 @@ ${self.head_content()}
     %endif
 	<div class="post">
 		%if mode != 'user':
-        <div><img src=${self.avatar_helper(True,p.has_photo,p.username)} alt="text"></div>
+        <div class = "avatar"><img src=${self.avatar_helper(True,p.has_photo,p.username)} alt="text"></div>
 		    <div class="user-name">
 			    <a href="${url_for('user', username = p.username, page = 1)}">${p.username}</a>
 		    </div>
@@ -68,19 +77,24 @@ ${self.head_content()}
 
 			%if is_auth:
 			    % if p.status == 'approved' and p.user_id == current_user.id or current_user.admin_mod == 1:
-			        - <a href="${url_for('edit_comment', post_id=p.post_id)}">edit</a>
-			        - <a href="${url_for('delete_comment', post_id=p.post_id)} ">Delete</a>
+		        <div class="controls">
+			        <a href="${url_for('edit_post', post_id=p.post_id)}">Edit</a>
+			        <a href="${url_for('delete_post', post_id=p.post_id)} ">Delete</a>
+				</div>
 			    %endif
 			%endif
         %if mode == 'user' and current_user.id == p.user_id:
 		     <h5>Post moderation status:</h5> ${p.status}
         %endif
-		<div class="comment-text">${p.post}</div>
+		<br><div class="post-text">${p.post}</div>
 		%if mode != 'tag':
 		    %for t in p.tags:
 		        <div><a href="${url_for('tag', tag = t.tag, page = 1)} ">${t.tag}</a></div>
 		    %endfor
 		%endif
+        %if comments_link:
+            <a href = "${url_for('post_view', id=p.post_id)}">Comments</a>
+        %endif
 	</div>
 %endfor
 

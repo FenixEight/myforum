@@ -23,17 +23,16 @@
 </%def>
 
 <%def name="post_form()">
-	<form method="post" action="${url_for('add_comment')}">
-		<h2>Post your comment</h2>
+	<form method="post" action="${url_for('add_post')}">
+		<h2>Write your post</h2>
 		<div class="input-section">
-			<label>Your comment</label>
 			<textarea name="comment_text"></textarea>
 		</div>
 		<div class="input-section">
 			<label>Tags</label>
 			<textarea name="tags"></textarea>
 		</div>
-		<input type="submit" value="Post comment" />
+		<input type="submit" value="Add post" />
 	</form>
 </%def>
 

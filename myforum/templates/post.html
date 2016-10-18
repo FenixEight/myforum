@@ -1,0 +1,76 @@
+<%inherit file="base.html"/>
+
+
+<%def name="page_content()">
+${self.posts_func('user',post,1,1, comments_link =False)}
+%if flat:
+    <a href = "${url_for('post_view', id=post[0].post_id)}">Tree comments</a>
+%else:
+    <a href = "${url_for('flat_post_view', id=post[0].post_id)}">Flat comments</a>
+%endif
+
+<a href="" class="show_form">Reply</a>
+
+<%
+    from myforum.model import Comment
+    c = Comment()
+    c.id = 0
+    self.get_form(c)
+%>
+
+%if comments:
+    %if flat:
+        %for c in comments:
+            ${self.comments_view(c)}
+        %endfor
+    %else:
+        ${self.make_tree(comments)}
+    %endif
+%endif
+</%def>
+
+
+
+<%def name="comments_view(c)">
+    <div class="comments" style="padding-left:${c.level*50}px">
+        %if c.is_deleted:
+            Comment was deleted.
+        %else:
+        <img src=${self.avatar_helper(True,c.has_photo,c.username)} alt="text">
+        <div class="user-name">${c.username}</div>
+        <div class="creation-date">${c.date}</div>
+        <div class="comment-text">${c.comment_text}</div>
+        %if current_user.id == post[0].user_id or current_user.admin_mod==1 or current_user.id == c.id:
+            <a href="${url_for('delete_comment', id = c.id)}">Delete</a>
+        %endif
+        <a href="" class="show_form">Reply</a>
+        ${self.get_form(c)}
+
+        %endif
+    </div>
+
+</%def>
+
+<%def name="make_tree(comm)">
+    <%
+        for c in comm:
+            self.comments_view(c)
+            if c.children:
+                for child in c.children:
+                    child.level= c.level + 1
+                self.make_tree(c.children)
+    %>
+
+</%def>
+
+<%def name="get_form(c)">
+
+    <form method="post"  action="${url_for('add_comment', post_id = post[0].post_id, parent_id = c.id)}" class="comment_form">
+		<div class="input-section">
+			<textarea name="comment_text"></textarea>
+		</div>
+		<input type="submit" value="Post comment" />
+	</form>
+
+</%def>
+
